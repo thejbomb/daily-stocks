@@ -1,7 +1,7 @@
 class Stock {
-    constructor() {
-        this.name = "",
-        this.price = 0;
+    constructor(name, price) {
+        this.name = name,
+        this.price = price;
     }
 }
 
