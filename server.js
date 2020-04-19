@@ -3,64 +3,48 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const schedule = require('node-schedule');
 const { MongoClient } = require('mongodb');
-
 require('dotenv').config();
-
 const alpha = require('alphavantage')({key: process.env.ALPHA_VANTAGE_API_KEY});
 
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
+const notification = require('./controllers/notification');
 
 const { companies } = require('./constants');
 const { Stock } = require('./controllers/Stock');
 
-let stocks = [];
-let url = "mongodb://localhost:27017/stocksDb";
+const client = MongoClient(process.env.MONGODB_URI, {useUnifiedTopology: true});
 
-MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
-    //connect to stocksDb
-    let dbo = db.db('stocksDb');
-    //document
-    let obj = { email: "1@gmail.com", password: "123", companies: ['azm', 'msft'], inc: 30, dec: 0};
-    //creates collection/table
-    dbo.createCollection("users", function(err, res) {
-        if (err) throw err;
-        console.log("collection created")
-    })
-    //inserts document
-    dbo.collection("users").insertOne(obj);
-    //find document
-    dbo.collection("users").findOne({email: "1@gmail.com"});
-    //update
-    dbo.collection("users").updateOne({email: "1@gmail.com"}, { email: "1@gmail.com", password: "12333333333", companies: ['azm', 'msft'], inc: 30, dec: 0})
-    db.close;
-})
+const connection = client.connect()
+.then(() => console.log("Db connected"))
+.catch(err => console.log(`DB Connection Error: ${err.message}`));
 
+const connect = connection;
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-//companies.forEach(myFunction);
+let stocks = new Map();
 
-function myFunction(companies, index) {
-    alpha.data.quote(companies).then(data => {
+function getStockPrices(company) {
+    alpha.data.quote(company).then(data => {
         let price = data['Global Quote']['05. price'];
-        let s = new Stock(companies, price);
-        stocks.push(s);
-    
-        console.log(index + " : " + s.name + " : " + s.price);
+        let stock = new Stock(company, price);
+        stocks.set(company, stock);
     })
+    .catch(err => console.log("Too many requests to alpha api"));
 }
 
-let job = schedule.scheduleJob('00 00 12 * * 0-6', function() {
-    console.log("check stocks")
+schedule.scheduleJob('00 00 12 * * 0-6', function() {
+    stocks = new Map();
+    companies.forEach(getStockPrices);
+    notification.handleNotification(client, connect, stocks);
 });
 
 app.get('/', (req, res)=> { res.send('it is working!') })
-app.get('/signin', (req, res) => { signin.handleSignin(req, res)});
-app.post('/register', (req, res) => { register.handleRegister(req, res)});
+app.post('/signin', (req, res) => { signin.handleSignin(req, res, client, connect, stocks)});
+app.post('/register', (req, res) => { register.handleRegister(req, res, client, connect, stocks)});
 app.post('/update')
 
 app.listen(3001, () => {

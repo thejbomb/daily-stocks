@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer')
+require('dotenv').config();
 
 // The credentials for the email account you want to send mail from. 
 const credentials = {
@@ -20,14 +21,14 @@ const transporter = nodemailer.createTransport(credentials)
 
 // exporting an 'async' function here allows 'await' to be used
 // as the return value of this function.
-module.exports = async (receiver, name, password) => {
+module.exports = async (receiver, msg) => {
 
   await transporter.sendMail({
     from: process.env.EMAIL_USERNAME,
     to: receiver,
     subject: 'Email confirmation',
-    text: `Hello ${name}, \nThank you for registering to https://facereq-smart-brain.herokuapp.com/.
-    \nYour account password is ${password}.`
+    text: msg
   })
+  .catch(err => console.log(err))
 
 }
