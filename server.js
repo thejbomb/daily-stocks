@@ -28,6 +28,7 @@ app.post('/signin', (req, res) => { signin.handleSignin(req, res, client, connec
 app.post('/register', (req, res) => { register.handleRegister(req, res, client, connect, stocks)});
 app.post('/update')
 
-app.listen(3001, () => {
-    console.log("app running on 3001")
+const port = process.env.NODE_ENV === 'dev' ? 3001 : 80;
+app.listen(port, () => {
+    console.log("app running on " + port);
 })
