@@ -12,10 +12,12 @@ let stocks = new Map();
 const sendNotification = (client, connect) => {
     stocks = new Map();
 
-    schedule.scheduleJob('00 00 12 * * 0-6', function() {
+    //schedule.scheduleJob('00 00 12 * * 0-6', function() {
+    schedule.scheduleJob('*/1 * * * *', function() {
         companies.forEach(getStockPrices);
         handleNotification(client, connect);
     });
+    console.log(stocks)
     return stocks;
 }
 
