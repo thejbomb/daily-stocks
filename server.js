@@ -24,7 +24,21 @@ app.use(bodyParser.json());
 //daily stocks retreival and notification calls
 let stocks = notification.sendNotification(client, connect);
 
+const getStock = (req, res) => {
+    const { company } = req.body;
+    console.log(company);
+    
+    if (stocks.has(company)) {
+        res.json(stocks.get(company));
+        console.log(stocks.get(company))
+    }
+    else {
+        res.json(400).json('company not included');
+    }
+}
+
 app.get('/', (req, res)=> { res.send('it is working!') })
+app.post('/stock', (req, res)=> { getStock(req, res)});
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, client, connect, stocks)});
 app.post('/register', (req, res) => { register.handleRegister(req, res, client, connect, stocks)});
 app.post('/update')

@@ -11,13 +11,12 @@ let stocks = new Map();
 //scheduled daily API requests and database lookup
 const sendNotification = (client, connect) => {
     stocks = new Map();
-
-    //schedule.scheduleJob('00 00 12 * * 0-6', function() {
-    schedule.scheduleJob('*/1 * * * *', function() {
+    companies.forEach(getStockPrices);
+    schedule.scheduleJob('0 9 * * *', function() {
         companies.forEach(getStockPrices);
         handleNotification(client, connect);
     });
-    console.log(stocks)
+    
     return stocks;
 }
 
@@ -33,24 +32,26 @@ function getStockPrices(company) {
 
 //database iteration of whole collection
 const handleNotification = (client, connect) => {
-    connect.then(() => {     
-        client.db("stocksDb")
-        .collection("Users")
-        .find({}, function(err, users) {
-            if (err) throw err;
-
-            users.forEach(user => {
-                let msg = '';
-                if (user) {
-                    msg = handleNotificationMsg(user);
-                }
-                if (msg.length > 0) {
-                    sendEmail(user.email, msg)
-                }
+    if (stocks.size > 0) {
+        connect.then(() => {     
+            client.db("stocksDb")
+            .collection("Users")
+            .find({}, function(err, users) {
+                if (err) throw err;
+    
+                users.forEach(user => {
+                    let msg = '';
+                    if (user) {
+                        msg = handleNotificationMsg(user);
+                    }
+                    if (msg.length > 0) {
+                        sendEmail(user.email, msg)
+                    }
+                })
             })
         })
-    })
-    .catch(err => console.log(err))
+        .catch(err => console.log(err))
+    }
 }
 
 //compiled msg based on price comparisons
