@@ -8,6 +8,7 @@ const { MongoClient } = require('mongodb');
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
 const notification = require('./controllers/notification');
+const update = require('./controllers/update');
 
 const client = MongoClient(process.env.MONGODB_URI, {useUnifiedTopology: true});
 
@@ -41,7 +42,7 @@ app.get('/', (req, res)=> { res.send('it is working!') })
 app.post('/stock', (req, res)=> { getStock(req, res)});
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, client, connect, stocks)});
 app.post('/register', (req, res) => { register.handleRegister(req, res, client, connect, stocks)});
-app.post('/update')
+app.post('/update', (req, res) => { update.handleUpdate(req, res, client, connect, stocks) });
 
 const port =  3001;
 app.listen(port, () => {
