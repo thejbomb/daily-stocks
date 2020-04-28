@@ -11,7 +11,7 @@ let stocks = new Map();
 //scheduled daily API requests and database lookup
 const sendNotification = (client, connect) => {
     stocks = new Map();
-    schedule.scheduleJob('*/1 * * * *', function() {
+    schedule.scheduleJob('0 9 * * *', function() {
         companies.forEach(getStockPrices);
         handleNotification(client, connect);
     });
