@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const morgan = require('morgan');
 require('dotenv').config();
 
 const { MongoClient } = require('mongodb');
@@ -10,15 +11,16 @@ const signin = require('./controllers/signin');
 const notification = require('./controllers/notification');
 const update = require('./controllers/update');
 
-const client = MongoClient(process.env.MONGODB_URI, {useUnifiedTopology: true});
+const client = MongoClient(process.env.MONGODB_URI, { useUnifiedTopology: true });
 
 const connection = client.connect()
 .then(() => console.log("Db connected"))
-.catch(err => console.log(`DB Connection Error: ${err.message}`));
+.catch(err => console.log(`DB Connection Error: ${ err.message }`));
 
 const connect = connection;
 const app = express();
 
+app.use(morgan('combined'));
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -32,5 +34,5 @@ app.post('/update', (req, res) => { update.handleUpdate(req, res, client, connec
 
 const port =  3001;
 app.listen(port, () => {
-    console.log("app running on " + port);
+    console.log(`app running on ${port}`);
 })

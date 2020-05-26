@@ -29,6 +29,6 @@ module.exports = async (receiver, msg) => {
     subject: 'Email confirmation',
     text: msg
   })
-  .catch(err => console.log(err))
+  .catch(err => console.log(err));
 
 }
