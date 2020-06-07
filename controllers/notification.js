@@ -8,7 +8,12 @@ const {Stock} = require('./Stock');
 
 let stocks = new Map();
 
-//scheduled daily API requests and database lookup
+/** 
+ * Scheduled daily API requests and database comparison of prices
+ * 
+ * @param {*} client The mongodb client
+ * @param {*} connect The mongodb database connection
+ */
 const sendNotification = (client, connect) => {
   stocks = new Map();
   schedule.scheduleJob('0 * * * *', function() {
@@ -19,7 +24,11 @@ const sendNotification = (client, connect) => {
   return stocks;
 }
 
-//API request to alpha for stock prices
+/**
+ * API request to alpha for stock prices
+ * 
+ * @param {string} company The company of interest for its daily stock price
+ */
 function getStockPrices(company) {
   alpha.data.quote(company).then((data) => {
     let price = data['Global Quote']['05. price'];
@@ -29,7 +38,12 @@ function getStockPrices(company) {
   .catch(err => console.log("Too many requests to alpha api"));
 }
 
-//database iteration of whole collection
+/**
+ * Database iteration of all collections
+ * 
+ * @param {*} client The mongodb client
+ * @param {*} connect The mongodb database connection
+ */
 const handleNotification = (client, connect) => {
   if (stocks.size > 0) {
     connect.then(() => {     
@@ -53,7 +67,11 @@ const handleNotification = (client, connect) => {
   }
 }
 
-//compiled msg based on price comparisons
+/**
+ * Compiles msg based on price comparisons during database iteration
+ * 
+ * @param {string} user The user of the current iteration in the database
+ */
 const handleNotificationMsg = (user) => {
   const {companies, increase, decrease} = user;
   const updateMsg = 'Update from Daily Stocks\n\n'

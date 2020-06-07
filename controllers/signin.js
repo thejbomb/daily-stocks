@@ -1,5 +1,13 @@
 const bcrypt = require('bcrypt');
 
+/**
+ * Handles signin api calls, retrieves the user documents from the database and returns it 
+ * @param {*} req The http request
+ * @param {*} res The http response
+ * @param {*} client The mongodb client
+ * @param {*} connect The mongodb database connection
+ * @param {Map} stocks The Map of all stocks and their prices for the day
+ */
 const handleSignin = (req, res, client, connect, stocks) => {
   const {email, password} = req.body;
   

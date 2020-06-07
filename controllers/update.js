@@ -1,3 +1,12 @@
+/**
+ * This function handles the stock list updates for the users, adding additional stock to the mongodb database
+ * 
+ * @param {*} req The http request
+ * @param {*} res The http response
+ * @param {*} client The mongodb client
+ * @param {*} connect The mongodb connection to the database
+ * @param {Map} stocks The Map of all stocks and their prices for the day
+ */
 const handleUpdate = (req, res, client, connect, stocks) => {
   const {company, email} = req.body;
   
@@ -7,6 +16,7 @@ const handleUpdate = (req, res, client, connect, stocks) => {
     res.json(400).json('company not included');
   }
   
+  //updates the user's document on the mongodb database
   connect.then(() => {     
     client.db("stocksDb")
     .collection("Users")
