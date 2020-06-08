@@ -21,7 +21,9 @@ const connect = connection;
 const app = express();
 
 app.use(morgan('combined'));
-app.use(cors());
+app.use(cors({
+    origin: 'dailystocks.info'
+}));
 app.use(bodyParser.json());
 
 //daily stocks retreival and notification calls
